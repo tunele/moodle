@@ -93,6 +93,9 @@ class report_log_renderable implements renderable {
     /** @var table_log table log which will be used for rendering logs */
     public $tablelog;
 
+    /** @var string component */
+    public $component;
+
     /**
      * Constructor.
      *
@@ -116,7 +119,7 @@ class report_log_renderable implements renderable {
      */
     public function __construct($logreader = "", $course = 0, $userid = 0, $modid = 0, $action = "", $groupid = 0, $edulevel = -1,
             $showcourses = false, $showusers = false, $showreport = true, $showselectorform = true, $url = "", $date = 0,
-            $logformat='showashtml', $page = 0, $perpage = 100, $order = "timecreated ASC", $origin ='') {
+            $logformat='showashtml', $page = 0, $perpage = 100, $order = "timecreated ASC", $origin ='', $component = '') {
 
         global $PAGE;
 
@@ -161,6 +164,7 @@ class report_log_renderable implements renderable {
         $this->showselectorform = $showselectorform;
         $this->logformat = $logformat;
         $this->origin = $origin;
+        $this->component = $component;
     }
 
     /**
@@ -299,6 +303,34 @@ class report_log_renderable implements renderable {
     public function get_selected_user_fullname() {
         $user = core_user::get_user($this->userid);
         return fullname($user);
+    }
+
+    /**
+     * Get component options
+     * @return array list of component options
+     */
+    public function get_component_options() {
+        global $DB;
+        if (!$this->tablelog) {
+            $this->tablelog = new report_log_table_log('');
+        }
+        $plugintypes = core_component::get_plugin_types();
+        $componentoptions = array();
+        foreach ($plugintypes as $kplugintype => $vplugintype) {
+            $componentstype = core_component::get_plugin_list($kplugintype);
+            foreach ($componentstype as $kcomponenttype => $vcomponenttype) {
+                $pluginfullname = $kplugintype . '_' . $kcomponenttype;
+                $ev = new stdClass();
+                $ev->component = $pluginfullname;
+                $compname = $this->tablelog->col_component($ev);
+                $componentoptions[$pluginfullname] = $compname;
+            }
+        }
+        // Add core and legacy.
+        $compname = get_string('coresystem');
+        $componentoptions['core'] = $compname;
+        natcasesort($componentoptions);
+        return $componentoptions;
     }
 
     /**
@@ -492,6 +524,8 @@ class report_log_renderable implements renderable {
         $filter->date = $this->date;
         $filter->orderby = $this->order;
         $filter->origin = $this->origin;
+        $filter->component = $this->component;
+
         // If showing site_errors.
         if ('site_errors' === $this->modid) {
             $filter->siteerrors = true;

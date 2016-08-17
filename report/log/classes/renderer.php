@@ -174,6 +174,13 @@ class report_log_renderer extends plugin_renderer_base {
         echo html_writer::label(get_string('edulevel'), 'menuedulevel', false, array('class' => 'accesshide'));
         echo html_writer::select($edulevel, 'edulevel', $reportlog->edulevel, false).$this->help_icon('edulevel');
 
+        // Add component, only if it's not already filtered by modid.
+        if (!(isset($reportlog->modid) && $reportlog->modid != '' && $reportlog->modid != 'site_errors')) {
+            $componentoptions = $reportlog->get_component_options();
+            echo html_writer::label(get_string('allcomponents'), 'menucomponent', false, array('class' => 'accesshide'));
+            echo html_writer::select($componentoptions, 'component', $reportlog->component, get_string("allcomponents"));
+        }
+
         // Add reader option.
         // If there is some reader available then only show submit button.
         $readers = $reportlog->get_readers(true);

@@ -492,6 +492,12 @@ class report_log_table_log extends table_sql {
             $params['origin'] = $this->filterparams->origin;
         }
 
+        // Component.
+        if (isset($this->filterparams->component) && ($this->filterparams->component != '')) {
+            $joins[] = "component = :component";
+            $params['component'] = $this->filterparams->component;
+        }
+
         if (!($this->filterparams->logreader instanceof logstore_legacy\log\store)) {
             // Filter out anonymous actions, this is N/A for legacy log because it never stores them.
             $joins[] = "anonymous = 0";

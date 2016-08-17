@@ -124,6 +124,7 @@ $string['all'] = 'All';
 $string['allactions'] = 'All actions';
 $string['allactivities'] = 'All activities';
 $string['allcategories'] = 'All categories';
+$string['allcomponents'] = 'All components';
 $string['alldays'] = 'All days';
 $string['allfieldsrequired'] = 'All fields are required';
 $string['allfiles'] = 'All files';
